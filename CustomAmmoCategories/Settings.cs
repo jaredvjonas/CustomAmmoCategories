@@ -8,17 +8,11 @@
  *  You should have received a copy of the GNU Lesser General Public License along with CustomAmmoCategories. 
  *  If not, see <https://www.gnu.org/licenses/>. 
 */
-using BattleTech;
-using CustomAmmoCategoriesLog;
-using Localize;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using CustomSettings;
-using Log = CustomAmmoCategoriesLog.Log;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Localize;
+using BattleTech;
 
 namespace CustAmmoCategories {
   [System.AttributeUsage(System.AttributeTargets.Property)]

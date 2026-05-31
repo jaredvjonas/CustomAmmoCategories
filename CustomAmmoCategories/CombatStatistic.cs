@@ -14,7 +14,6 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
-using Log = CustomAmmoCategoriesLog.Log;
 
 namespace CustAmmoCategories {
   [HarmonyPatch(typeof(Briefing), "InitializeContractComplete")]

@@ -501,11 +501,11 @@ namespace CustomUnits {
           locationsSizes.Add(component.MountedLocation, InventorySize);
         }
       }
-      for (int index = 0; index < mechDef.Chassis.Locations.Length; ++index) {
-        if (locationsSizes.TryGetValue(mechDef.Chassis.Locations[index].Location, out var invSize)) {
-          mechDef.Chassis.Locations[index].InventorySlots = invSize;
-        }
-      }
+      // for (int index = 0; index < mechDef.Chassis.Locations.Length; ++index) {
+      //   if (locationsSizes.TryGetValue(mechDef.Chassis.Locations[index].Location, out var invSize)) {
+      //     mechDef.Chassis.Locations[index].InventorySlots = invSize;
+      //   }
+      // }
       mechDef.Chassis.refreshLocationReferences();
       foreach (var locationSize in locationsSizes) {
         Log.M?.WL(1, $" {locationSize.Key} {mechDef.Chassis.GetLocationDef(locationSize.Key).InventorySlots}");

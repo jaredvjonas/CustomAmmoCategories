@@ -1,11 +1,12 @@
-﻿using BattleTech;
-using CustomAmmoCategoriesLog;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using HarmonyLib;
 using UnityEngine;
+using BattleTech;
 
 namespace CustomAmmoCategoriesPrivate {
   [HarmonyPatch(typeof(StackManager))]

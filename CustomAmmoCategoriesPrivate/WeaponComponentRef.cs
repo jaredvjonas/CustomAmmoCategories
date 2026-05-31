@@ -1,12 +1,10 @@
-﻿using BattleTech;
-using BattleTech.UI;
-using BattleTech.UI.TMProWrapper;
-using BattleTech.UI.Tooltips;
-using CustomAmmoCategoriesLog;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using UnityEngine;
+using BattleTech;
+using BattleTech.UI;
+using BattleTech.UI.Tooltips;
 
 namespace CustAmmoCategories {
   [HarmonyPatch(typeof(LanceMechEquipmentListItem))]
@@ -17,12 +15,12 @@ namespace CustAmmoCategories {
     public static void Prefix(ref bool __runOriginal, LanceMechEquipmentListItem __instance, MechComponentDef MechDef) {
       try {
         if(__runOriginal == false) { return; }
-        if(__instance.componentRef == null) { return; }
+        if(__instance.GetComponentRef() == null) { return; }
         __runOriginal = false;
         if(__instance.EquipmentTooltip == null) { __instance.EquipmentTooltip = __instance.GetComponent<HBSTooltip>(); }
         if((__instance.EquipmentTooltip == null) || (MechDef == null)) { return; }
-        if(__instance.componentRef.ComponentDefType == ComponentType.Weapon) {
-          __instance.EquipmentTooltip.SetDefaultStateData(__instance.componentRef.GetTooltipStateData());
+        if(__instance.GetComponentRef().ComponentDefType == ComponentType.Weapon) {
+          __instance.EquipmentTooltip.SetDefaultStateData(__instance.GetComponentRef().GetTooltipStateData());
         } else {
           __instance.EquipmentTooltip.SetDefaultStateData(TooltipUtilities.GetStateDataFromObject(TooltipUtilities.MechComponentDefHandlerForTooltip(MechDef)));
         }

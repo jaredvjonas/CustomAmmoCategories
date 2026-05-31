@@ -24,7 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion Condition="'$(LangVersion)'==''">7.3</LangVersion>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>12</LangVersion>
+    <LangVersion Condition="'$(LangVersion)'==''">12</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -44,13 +44,15 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Krafs.Publicizer" Version="2.2.1" />
+    <PackageReference Include="MessagePack" Version="1.7.3.7" />
     <Publicize Include="Assembly-CSharp;UnityEngine.UI;UnityEngine.CoreModule;InControl" />
     <DoNotPublicize Include="Assembly-CSharp:BattleTech.UI.SelectionState;Assembly-CSharp:WeaponEffect;Assembly-CSharp:BattleTech.UI.SelectionStateCommand" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BattleTechGameDir)\Mods\ModTek\Harmony12X\0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\0Harmony.dll')">$(RepoLibs)\0Harmony.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\0Harmony.dll')">$(BattleTechGameDir)\mods\ModTek\lib\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(BattleTechGameDir)\Mods\.modtek\AssembliesInjected\\Assembly-CSharp.dll</HintPath>
@@ -59,25 +61,34 @@
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="CustomComponents">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomComponents\CustomComponents.dll</HintPath>
+      <HintPath>..\..\CustomComponents\source\CustomComponents\bin\Release\net472\CustomComponents.dll</HintPath>
     </Reference>
     <Reference Include="CustomLocalization">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomLocalization\CustomLocalization.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomLocalization.dll')">$(RepoLibs)\CustomLocalization.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomLocalization.dll')">$(BattleTechGameDir)\Mods\Core\CustomLocalization\CustomLocalization.dll</HintPath>
     </Reference>
     <Reference Include="CustomLocalSettings">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomLocalSettings\CustomLocalSettings.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomLocalSettings.dll')">$(RepoLibs)\CustomLocalSettings.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomLocalSettings.dll')">$(BattleTechGameDir)\Mods\Core\CustomLocalSettings\CustomLocalSettings.dll</HintPath>
     </Reference>
     <Reference Include="CustomPrewarm">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomPrewarm\CustomPrewarm.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomPrewarm.dll')">$(RepoLibs)\CustomPrewarm.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomPrewarm.dll')">$(BattleTechGameDir)\Mods\Core\CustomPrewarm\CustomPrewarm.dll</HintPath>
+    </Reference>
+    <Reference Include="MessagePack">
+      <HintPath Condition="Exists('$(RepoLibs)\\MessagePack.dll')">$(RepoLibs)\MessagePack.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\MessagePack.dll')">$(UserProfile)\.nuget\packages\messagepack\1.7.3.7\lib\net47\MessagePack.dll</HintPath>
     </Reference>
     <Reference Include="CustomVoices">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomVoices\CustomVoices.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomVoices.dll')">$(RepoLibs)\CustomVoices.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomVoices.dll')">$(BattleTechGameDir)\Mods\Core\CustomVoices\CustomVoices.dll</HintPath>
     </Reference>
     <Reference Include="Dapper.Unity">
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Dapper.Unity.dll</HintPath>
     </Reference>
     <Reference Include="EPPlus">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomLocalization\EPPlus.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\EPPlus.dll')">$(RepoLibs)\EPPlus.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\EPPlus.dll')">$(BattleTechGameDir)\Mods\Core\CustomLocalization\EPPlus.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="InControl, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -85,18 +96,17 @@
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\InControl.dll</HintPath>
     </Reference>
     <Reference Include="IRBTModUtils">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\IRBTModUtils\IRBTModUtils.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\IRBTModUtils.dll')">$(RepoLibs)\IRBTModUtils.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\IRBTModUtils.dll')">$(BattleTechGameDir)\Mods\Core\IRBTModUtils\IRBTModUtils.dll</HintPath>
     </Reference>
-    <Reference Include="MessagePack">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomPrewarm\MessagePack.dll</HintPath>
-    </Reference>
+    
     <Reference Include="Mono.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -207,6 +217,12 @@
     <Compile Include="Artillery.cs" />
     <Compile Include="AttackDirectionIndicator.cs" />
     <Compile Include="AttackLog.cs" />
+    <Compile Include="IsExternalInit.cs" />
+    <Compile Include="GlobalUsings.cs" />
+    <Compile Include="CompatibilityShims.cs" />
+    <Compile Include="MovementFeatureShim.cs" />
+    <Compile Include="IsExternalInit.cs" />
+    <Compile Include="GlobalUsings.cs" />
     <Compile Include="AttackSequenceImpact.cs" />
     <Compile Include="AttackSequenceWatchdog.cs" />
     <Compile Include="AudioPlayer.cs" />
@@ -353,22 +369,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-if exist "$(BattleTechGameDir)\Mods_CBDE\Core\CustomAmmoCategories" (
-  copy /Y "$(TargetPath)" "$(BattleTechGameDir)\Mods_CBDE\Core\CustomAmmoCategories"
-  copy /Y "$(ProjectDir)..\AdditionalFiles\CAC\README.txt" "$(BattleTechGameDir)\Mods_CBDE\Core\CustomAmmoCategories"
-)
-if exist "$(BattleTechGameDir)\Mods\Core\CustomAmmoCategories" (
-  echo %25BattleTechGameDir%25
-  copy /Y "$(TargetPath)" "$(BattleTechGameDir)\Mods\Core\CustomAmmoCategories"
-  copy /Y "$(ProjectDir)..\AdditionalFiles\CAC\README.txt" "$(BattleTechGameDir)\Mods\Core\CustomAmmoCategories"
-)
-if exist "$(RogueTechRepo)\Core\CustomAmmoCategories" (
-  echo %25BattleTechGameDir%25
-  copy /Y "$(TargetPath)" "$(RogueTechRepo)\Core\CustomAmmoCategories"
-  copy /Y "$(ProjectDir)..\AdditionalFiles\CAC\README.txt" "$(RogueTechRepo)\Core\CustomAmmoCategories"
-)
-		</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "$(BattleTechGameDir)\mods\CustomAmmoCategories"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="BeforeBuild" Inputs="@(Preprocess)" Outputs="@(Preprocess->'%(Filename)_P.cs')">
     <Exec Command="..\Bin\cpp.exe @(Preprocess) -P -o %(RelativeDir)%(Filename)_P.cs" />

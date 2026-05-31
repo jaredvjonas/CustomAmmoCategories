@@ -13,6 +13,7 @@ using CustomAmmoCategoriesLog;
 using CustomAmmoCategoriesPatches;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CustAmmoCategoriesPatches {
 

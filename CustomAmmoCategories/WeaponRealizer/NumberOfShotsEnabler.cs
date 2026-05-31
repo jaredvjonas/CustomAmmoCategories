@@ -34,6 +34,13 @@ namespace WeaponRealizer {
     private static void BuildBallisticEffectOnImpact() {
       // OnImpact is protected
       var mi = AccessTools.Method(typeof(BallisticEffect), "OnImpact", new Type[] { typeof(float), typeof(float) });
+      if (mi == null) {
+        try {
+          Log.M?.WL("WeaponRealizer: BallisticEffect.OnImpact method not found; skipping handler build.");
+        } catch {
+        }
+        return;
+      }
       BallisticEffect_OnImpact = MethodInvoker.GetHandler(mi);
     }
 

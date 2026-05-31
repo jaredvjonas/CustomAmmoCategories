@@ -34,7 +34,6 @@ using Newtonsoft.Json;
 using System.Threading;
 using BattleTech.Data;
 using CustomSettings;
-using Log = CustomAmmoCategoriesLog.Log;
 using InControl;
 using System.Reflection.Emit;
 using IRBTModUtils;

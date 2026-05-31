@@ -8,21 +8,20 @@
  *  You should have received a copy of the GNU Lesser General Public License along with CustomAmmoCategories. 
  *  If not, see <https://www.gnu.org/licenses/>. 
 */
-using HarmonyLib;
 using System.Reflection;
-using System.Threading;
-using IRBTModUtils;
-using BattleTech;
-using System.Collections.Generic;
-using CustomAmmoCategoriesLog;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HarmonyLib;
+using UnityEngine;
+using BattleTech;
+using CustAmmoCategories;
 
-namespace CustAmmoCategories {
+namespace CustomAmmoCategoriesPrivate {
   public static class AIPathingLimiter {
     public static string LIMIT_PATHING_SAMPLES = "LIMIT_PATHING_SAMPLES";
     public static MethodBase GetSampledPathNodes() => (MethodBase)AccessTools.Method(typeof(PathNodeGrid), "GetSampledPathNodes");

@@ -394,6 +394,8 @@ namespace CustAmmoCategories {
     private static ConcurrentDictionary<string, ExtAmmunitionDef> ExtAmmunitionDef;
     private static ConcurrentDictionary<string, ExtWeaponDef> ExtWeaponDef;
     private static ConcurrentDictionary<string, ConcurrentDictionary<string, WeaponEffect>> WeaponEffects;
+    private static readonly object initLock = new object();
+    
     public static CustomAmmoCategory NotSetCustomAmmoCategoty;
     public static ExtAmmunitionDef DefaultAmmo;
     public static ExtWeaponDef DefaultWeapon;
@@ -826,25 +828,27 @@ namespace CustAmmoCategories {
     }
     public static bool isInited { get; set; } = false;
     public static void CustomCategoriesInit() {
-      if (isInited == true) { return; };
-      isInited = true;
-      CustomAmmoCategories.items = new ConcurrentDictionary<string, CustomAmmoCategory>();
-      CustomAmmoCategories.WeaponEffects = new ConcurrentDictionary<string, ConcurrentDictionary<string, WeaponEffect>>();
-      CustomAmmoCategories.ExtAmmunitionDef = new ConcurrentDictionary<string, ExtAmmunitionDef>();
-      CustomAmmoCategories.ExtWeaponDef = new ConcurrentDictionary<string, ExtWeaponDef>();
-      CustomAmmoCategories.amsWeapons = new Dictionary<string, Weapon>();
-      foreach (var baseAmmoCat in AmmoCategoryEnumeration.AmmoCategoryList) {
-        CustomAmmoCategory itm = new CustomAmmoCategory();
-        itm.BaseCategory = baseAmmoCat;
-        itm.Id = baseAmmoCat.Name;
-        itm.Index = baseAmmoCat.ID;
-        items[itm.Id] = itm;
-        if (itm.Index == 0) { NotSetCustomAmmoCategoty = itm; };
+      lock (initLock) {
+        if (isInited) { return; }
+        isInited = true;
+        if (CustomAmmoCategories.items == null) CustomAmmoCategories.items = new ConcurrentDictionary<string, CustomAmmoCategory>();
+        if (CustomAmmoCategories.WeaponEffects == null) CustomAmmoCategories.WeaponEffects = new ConcurrentDictionary<string, ConcurrentDictionary<string, WeaponEffect>>();
+        if (CustomAmmoCategories.ExtAmmunitionDef == null) CustomAmmoCategories.ExtAmmunitionDef = new ConcurrentDictionary<string, ExtAmmunitionDef>();
+        if (CustomAmmoCategories.ExtWeaponDef == null) CustomAmmoCategories.ExtWeaponDef = new ConcurrentDictionary<string, ExtWeaponDef>();
+        if (CustomAmmoCategories.amsWeapons == null) CustomAmmoCategories.amsWeapons = new Dictionary<string, Weapon>();
+        foreach (var baseAmmoCat in AmmoCategoryEnumeration.AmmoCategoryList) {
+          CustomAmmoCategory itm = new CustomAmmoCategory();
+          itm.BaseCategory = baseAmmoCat;
+          itm.Id = baseAmmoCat.Name;
+          itm.Index = baseAmmoCat.ID;
+          items[itm.Id] = itm;
+          if (itm.Index == 0) { NotSetCustomAmmoCategoty = itm; };
+        }
+        if (CustomAmmoCategories.DefaultAmmo == null) CustomAmmoCategories.DefaultAmmo = new ExtAmmunitionDef();
+        if (CustomAmmoCategories.DefaultWeaponMode == null) CustomAmmoCategories.DefaultWeaponMode = new WeaponMode();
+        if (CustomAmmoCategories.DefaultWeapon == null) CustomAmmoCategories.DefaultWeapon = new ExtWeaponDef();
+        CustomAmmoCategories.printItems();
       }
-      CustomAmmoCategories.DefaultAmmo = new ExtAmmunitionDef();
-      CustomAmmoCategories.DefaultWeaponMode = new WeaponMode();
-      CustomAmmoCategories.DefaultWeapon = new ExtWeaponDef();
-      CustomAmmoCategories.printItems();
     }
     public static void printItems() {
       Log.M?.WL(0,"Custom ammo categories:");
@@ -1204,6 +1208,8 @@ namespace CustAmmoCategories {
 
 namespace CACMain {
   public static class Core {
+    private static readonly object coreInitLock = new object();
+    private static volatile bool coreWorkerThreadStarted = false;
     public static Harmony harmony { get; set; } = null;
     public static bool MechEngineerDetected { get; set; } = false;
     public static Type privateAssemblyCore { get; set; } = null;
@@ -1346,23 +1352,72 @@ namespace CACMain {
       Log.InitLog();
       Log.M?.TWL(0,"Initing... " + directory + " version: " + Assembly.GetExecutingAssembly().GetName().Version + " debug:"+ CustomAmmoCategories.Settings.debugLog, true);
       Log.M?.TWL(0,"Reading settings");
-      //foreach(string arg in Environment.GetCommandLineArgs()) {
-      //  Log.M.WL(1, arg);
-      //}
       string privateAssemblyPath = Path.Combine(directory,"CustomAmmoCategoriesPrivate.dll");
-      Assembly privateAssembly = Assembly.LoadFile(privateAssemblyPath);
+      Assembly privateAssembly = null;
+      try {
+        privateAssembly = Assembly.LoadFile(privateAssemblyPath);
+      } catch (Exception ex) {
+        string msg = "Failed to load CustomAmmoCategoriesPrivate.dll: " + privateAssemblyPath + " -> " + ex.Message;
+        Log.M?.TWL(0, msg, true);
+        try { UnityGameInstance.logger.LogError(msg); } catch { }
+        throw;
+      }
+      if (privateAssembly == null) {
+        string msg = "Loaded assembly is null for CustomAmmoCategoriesPrivate.dll: " + privateAssemblyPath;
+        Log.M?.TWL(0, msg, true);
+        try { UnityGameInstance.logger.LogError(msg); } catch { }
+        throw new Exception(msg);
+      }
       privateAssemblyCore = privateAssembly.GetType("CustomAmmoCategoriesPrivate.Core");
-      AccessTools.Method(privateAssemblyCore, "Init").Invoke(null, new object[] { });
-      SelfDocumentationHelper.CreateSelfDocumentation(directory);
-      CustomAmmoCategories.Settings = JsonConvert.DeserializeObject<CustAmmoCategories.Settings>(File.ReadAllText(settings_filename));
-      CustomAmmoCategories.GlobalSettings = JsonConvert.DeserializeObject<CustAmmoCategories.Settings>(File.ReadAllText(settings_filename));
-      CustomAmmoCategories.Settings.directory = directory;
+      if (privateAssemblyCore == null) {
+        string msg = "Type 'CustomAmmoCategoriesPrivate.Core' not found in " + privateAssemblyPath;
+        Log.M?.TWL(0, msg, true);
+        try { UnityGameInstance.logger.LogError(msg); } catch { }
+        throw new Exception(msg);
+      }
+      try {
+        var method = AccessTools.Method(privateAssemblyCore, "Init");
+        if (method == null) {
+          string msg = "Method 'Init' not found on CustomAmmoCategoriesPrivate.Core";
+          Log.M?.TWL(0, msg, true);
+          try { UnityGameInstance.logger.LogError(msg); } catch { }
+          throw new Exception(msg);
+        }
+        method.Invoke(null, new object[] { });
+      } catch (Exception ex) {
+        Log.M?.TWL(0, "private Init invocation failed: " + ex.ToString(), true);
+        try { UnityGameInstance.logger.LogException(ex); } catch { }
+        throw;
+      }
+      try {
+        SelfDocumentationHelper.CreateSelfDocumentation(directory);
+      } catch (Exception ex) {
+        Log.M?.TWL(0, "SelfDocumentationHelper.CreateSelfDocumentation failed: " + ex.ToString(), true);
+        try { UnityGameInstance.logger.LogException(ex); } catch { }
+        throw;
+      }
+      try {
+        var raw = File.ReadAllText(settings_filename);
+        CustomAmmoCategories.Settings = JsonConvert.DeserializeObject<CustAmmoCategories.Settings>(raw);
+        CustomAmmoCategories.GlobalSettings = JsonConvert.DeserializeObject<CustAmmoCategories.Settings>(raw);
+        if (CustomAmmoCategories.Settings == null) {
+          string msg = "Deserialized CustomAmmoCategories.Settings is null from " + settings_filename;
+          Log.M?.TWL(0, msg, true);
+          try { UnityGameInstance.logger.LogError(msg); } catch { }
+          throw new Exception(msg);
+        }
+        CustomAmmoCategories.Settings.directory = directory;
+      } catch (Exception ex) {
+        Log.M?.TWL(0, "Failed to read/deserialize settings: " + ex.ToString(), true);
+        try { UnityGameInstance.logger.LogException(ex); } catch { }
+        throw;
+      }
       foreach (var dd in CustomAmmoCategories.Settings.DefaultAoEDamageMult) {
         Log.M.WL(1, dd.Key.ToString() + "={range:"+dd.Value.Range+" damage:"+dd.Value.Damage+"}");
       }
-      ToHitModifiersHelper.Init();
-      CustomAmmoCategories.InitHitLocationsAOE();
-      CustomAmmoCategories.InitLocationsSubsystem();
+      try { ToHitModifiersHelper.Init(); } catch (Exception ex) { Log.M?.TWL(0, "ToHitModifiersHelper.Init failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } throw; }
+      try { CustomAmmoCategories.InitHitLocationsAOE(); } catch (Exception ex) { Log.M?.TWL(0, "InitHitLocationsAOE failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } throw; }
+      try { CustomAmmoCategories.InitLocationsSubsystem(); } catch (Exception ex) { Log.M?.TWL(0, "InitLocationsSubsystem failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } throw; }
       //try {
       //  Dictionary<string, uint> audioEvents = SceneSingletonBehavior<WwiseManager>.Instance.guidIdMap;
       //  Log.M?.WL(0,"audioEvents:", true);
@@ -1389,7 +1444,7 @@ namespace CACMain {
           WRSettings = new WeaponRealizer.Settings();
         }
       }
-      WeaponRealizer.Core.Init(directory, WRSettings);
+      try { WeaponRealizer.Core.Init(directory, WRSettings); } catch (Exception ex) { Log.M?.TWL(0, "WeaponRealizer.Core.Init failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } throw; }
       if (string.IsNullOrEmpty(CustomAmmoCategories.Settings.AIMStandalone) == false) {
         string AIMPath = Path.Combine(directory, CustomAmmoCategories.Settings.AIMStandalone);
         if (File.Exists(AIMPath) == false) {
@@ -1401,18 +1456,62 @@ namespace CACMain {
           Assembly AIM = Assembly.LoadFile(AIMPath);
           Log.M?.WL(0, "Initing AIM");
           Type AIMMod = AIM.GetType("Sheepy.BattleTechMod.AttackImprovementMod.Mod");
-          AIMMod.GetField("failToLoad",BindingFlags.Static|BindingFlags.Public).SetValue(null, false);
-          AIMMod.GetMethod("Init", BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[2] { directory, string.Empty});
-          AIMModSettings = (Sheepy.BattleTechMod.AttackImprovementMod.ModSettings)AIMMod.GetField("AIMSettings").GetValue(null);
+          if (AIMMod == null) {
+            string msg = "AIM Mod type not found in " + AIMPath;
+            Log.M?.TWL(0, msg, true);
+            try { UnityGameInstance.logger.LogError(msg); } catch { }
+            throw new Exception(msg);
+          }
+          var failField = AIMMod.GetField("failToLoad", BindingFlags.Static | BindingFlags.Public);
+          if (failField != null) { failField.SetValue(null, false); } else { Log.M?.TWL(0, "AIM Mod 'failToLoad' field not found", true); }
+          try {
+            var initMethod = AIMMod.GetMethod("Init", BindingFlags.Static | BindingFlags.Public);
+            if (initMethod == null) { string msg = "AIM Mod Init method not found"; Log.M?.TWL(0, msg, true); try { UnityGameInstance.logger.LogError(msg); } catch { } throw new Exception(msg); }
+            initMethod.Invoke(null, new object[2] { directory, string.Empty});
+          } catch (Exception ex) {
+            Log.M?.TWL(0, "AIM Init invocation failed: " + ex.ToString(), true);
+            try { UnityGameInstance.logger.LogException(ex); } catch { }
+            throw;
+          }
+          var aimSettingsField = AIMMod.GetField("AIMSettings");
+          if (aimSettingsField != null) {
+            AIMModSettings = (Sheepy.BattleTechMod.AttackImprovementMod.ModSettings)aimSettingsField.GetValue(null);
+            if (AIMModSettings == null) {
+              Log.M?.TWL(0, "AIMModSettings field returned null", true);
+              try { UnityGameInstance.logger.LogError("AIMModSettings field returned null"); } catch { }
+            }
+          } else {
+            Log.M?.TWL(0, "AIMSettings field not found on AIM Mod", true);
+            try { UnityGameInstance.logger.LogError("AIMSettings field not found on AIM Mod"); } catch { }
+          }
         }
       }
       try {
         Core.harmony = new Harmony("io.mission.modrepuation");
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
-        InternalClassPathes.PatchInternalClasses(harmony);
-        AccessTools.Field(typeof(FootstepManager), "maxDecals").SetValue(null, 1023);
-        Thread thread = new Thread(ThreadWork.DoWork);
-        thread.Start();
+        if (harmony == null) {
+          Log.M?.TWL(0, "Harmony instance creation failed (null)", true);
+          try { UnityGameInstance.logger.LogError("Harmony creation returned null"); } catch { }
+          throw new Exception("Harmony creation failed");
+        }
+        try { harmony.PatchAll(Assembly.GetExecutingAssembly()); } catch (Exception ex) { Log.M?.TWL(0, "harmony.PatchAll failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } throw; }
+        try { InternalClassPathes.PatchInternalClasses(harmony); } catch (Exception ex) { Log.M?.TWL(0, "PatchInternalClasses failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } throw; }
+        var maxDecalsField = AccessTools.Field(typeof(FootstepManager), "maxDecals");
+        if (maxDecalsField == null) {
+          Log.M?.TWL(0, "FootstepManager.maxDecals field not found", true);
+          try { UnityGameInstance.logger.LogError("FootstepManager.maxDecals field not found"); } catch { }
+        } else {
+          try { maxDecalsField.SetValue(null, 1023); } catch (Exception ex) { Log.M?.TWL(0, "Setting maxDecals failed: " + ex.ToString(), true); try { UnityGameInstance.logger.LogException(ex); } catch { } }
+        }
+        lock (coreInitLock) {
+          if (!coreWorkerThreadStarted) {
+            coreWorkerThreadStarted = true;
+            Thread worker = new Thread(ThreadWork.DoWork);
+            worker.IsBackground = true;
+            worker.Start();
+          } else {
+            Log.M?.WL(2, "Worker thread already started, skipping.");
+          }
+        }
         CustAmmoCategories.Online.OnlineClientHelper.Init();
       } catch (Exception e) {
         Log.M?.TWL(0,e.ToString(),true);

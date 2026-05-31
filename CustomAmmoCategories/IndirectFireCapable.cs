@@ -8,19 +8,14 @@
  *  You should have received a copy of the GNU Lesser General Public License along with CustomAmmoCategories. 
  *  If not, see <https://www.gnu.org/licenses/>. 
 */
+using System.Reflection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using HarmonyLib;
-using BattleTech;
-using BattleTech.UI;
-using BattleTech.AttackDirectorHelpers;
-using System.Reflection;
-using CustAmmoCategories;
 using UnityEngine;
-using HBS.Math;
-using CustomAmmoCategoriesLog;
+using BattleTech;
+using CustAmmoCategories;
+using BattleTech.UI;
 
 namespace CustAmmoCategories {
   public static partial class CustomAmmoCategories {
@@ -303,8 +298,8 @@ namespace CustomAmmoCategoriesPatches {
       return Transpilers.MethodReplacer(instructions, targetPropertyGetter, replacementMethod);
     }
     
-    private record struct ChassisModifierKey(ExtAmmunitionDef ammo, ExtWeaponDef exDef, WeaponMode mod, ICombatant target);
-    
+    private readonly record struct ChassisModifierKey(ExtAmmunitionDef ammo, ExtWeaponDef exDef, WeaponMode mod, ICombatant target);
+
     private static Dictionary<ChassisModifierKey, float> ChassisModifierCache = new Dictionary<ChassisModifierKey, float>();
 
     public static void ClearChassisModifierCache()

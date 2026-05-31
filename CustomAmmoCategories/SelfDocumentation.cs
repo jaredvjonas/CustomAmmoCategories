@@ -239,8 +239,12 @@ namespace CustAmmoCategories {
       }
     }
     public static bool isSelfDocumented(this Type t) {
-      foreach (var attr in t.GetCustomAttributes(true)) {
-        if (attr as SelfDocumentedClass != null) { return true; }
+      try {
+        foreach (var attr in t.GetCustomAttributes(true)) {
+          if (attr as SelfDocumentedClass != null) { return true; }
+        }
+      } catch (Exception) {
+        return false;
       }
       return false;
     }
@@ -280,7 +284,13 @@ namespace CustAmmoCategories {
       return is_lower ? val.ToString().ToLower() : val.ToString();
     }
     public static void CreateSelfDocumentation(string directory) {
-      var selfDocTypes = Assembly.GetExecutingAssembly().GetTypes().Where(p => p.isSelfDocumented());
+      Type[] allTypes;
+      try {
+        allTypes = Assembly.GetExecutingAssembly().GetTypes();
+      } catch (ReflectionTypeLoadException ex) {
+        allTypes = ex.Types.Where(t => t != null).ToArray();
+      }
+      var selfDocTypes = allTypes.Where(p => p.isSelfDocumented());
       string documentationDir = Path.Combine(directory, "documentation");
       if (Directory.Exists(documentationDir) == false) { Directory.CreateDirectory(documentationDir); };
       string[] docDirs = Directory.GetDirectories(documentationDir, "*", SearchOption.TopDirectoryOnly);

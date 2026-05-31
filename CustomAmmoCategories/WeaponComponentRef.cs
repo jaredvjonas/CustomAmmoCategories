@@ -344,7 +344,7 @@ namespace CustAmmoCategories {
         }
       }
       ammomodes.Sort((a, b) => { return b.sortFactor.CompareTo(a.sortFactor); });
-      Log.M?.TWL(0, $"GetCurrentAmmoMode:{weaponRef.ComponentDefID} LocalGUID:{weaponRef.LocalGUID} ammomodes:{ammomodes.Count}");
+      Log.M?.TWL(0, $"GetCurrentAmmoMode:{weaponRef.ComponentDefID} LocalGUID:{weaponRef.SimGameUID} ammomodes:{ammomodes.Count}");
       foreach (var ammomode in ammomodes) {
         Log.M?.WL(1,$"{ammomode.mode.Id}({ammomode.mode.Name}):{ammomode.ammo.Id}");
       }
@@ -495,7 +495,7 @@ namespace CustAmmoCategories {
         Log.M?.TWL(0, $"Fail to gather modes for {weaponRef.ComponentDefID}");
         Log.M?.WL(0, e.ToString(), true);
       }
-      Log.M?.TWL(0, $"GatherModesDirectly:{weaponRef.ComponentDefID} SimGameUID:{weaponRef.SimGameUID} LocalGUID:{weaponRef.LocalGUID} inventory:{inventory.Count}");
+      Log.M?.TWL(0, $"GatherModesDirectly:{weaponRef.ComponentDefID} SimGameUID:{weaponRef.SimGameUID} LocalGUID:{weaponRef.SimGameUID} inventory:{inventory.Count}");
       foreach (var mode in result) {
         Log.M?.WL(1, $"mode:{mode.Value.Id}({mode.Value.Name}) category:{(mode.Value.AmmoCategory == null? "null":mode.Value.AmmoCategory.Id)}");
       };

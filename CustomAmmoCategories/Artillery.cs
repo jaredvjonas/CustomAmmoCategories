@@ -176,11 +176,11 @@ namespace CustAmmoCategories {
       foreach(var weapon in owner.weapons) {
         weaponsEnabledState[weapon] = weapon.IsEnabled;
       }
-      if(MovementFeature.IsImmobile(unit)) {
+      if(IRBTModUtils.Feature.MovementFeatureShim.IsImmobile(unit)) {
         AlreadyImmobilized = true;
       } else {
         AlreadyImmobilized = false;
-        MovementFeature.SetImmobile(unit, true);
+        IRBTModUtils.Feature.MovementFeatureShim.SetImmobile(unit, true);
       }
     }
     public void Clear() {
@@ -188,7 +188,7 @@ namespace CustAmmoCategories {
         if(weapon.Value == true) { weapon.Key.EnableWeapon(); };
       }
       if(this.AlreadyImmobilized == false) {
-        MovementFeature.SetImmobile(unit, false);
+        IRBTModUtils.Feature.MovementFeatureShim.SetImmobile(unit, false);
       }
     }
   }

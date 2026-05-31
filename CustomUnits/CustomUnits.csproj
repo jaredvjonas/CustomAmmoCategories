@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion Condition="'$(LangVersion)'==''">7.2</LangVersion>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion Condition="'$(LangVersion)'==''">7.3</LangVersion>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
@@ -46,7 +46,8 @@
   <ItemGroup>
     <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BattleTechGameDir)\Mods\ModTek\Harmony12X\0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\0Harmony.dll')">$(RepoLibs)\0Harmony.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\0Harmony.dll')">$(BattleTechGameDir)\mods\ModTek\lib\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(BattleTechGameDir)\Mods\.modtek\AssembliesInjected\Assembly-CSharp.dll</HintPath>
@@ -55,23 +56,27 @@
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="CustomComponents">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomComponents\CustomComponents.dll</HintPath>
+      <HintPath>..\..\CustomComponents\source\CustomComponents\bin\Release\net472\CustomComponents.dll</HintPath>
     </Reference>
     <Reference Include="CustomLocalSettings, Version=1.0.0.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomLocalSettings\CustomLocalSettings.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomLocalSettings.dll')">$(RepoLibs)\CustomLocalSettings.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomLocalSettings.dll')">$(BattleTechGameDir)\Mods\Core\CustomLocalSettings\CustomLocalSettings.dll</HintPath>
     </Reference>
     <Reference Include="CustomPrewarm">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomPrewarm\CustomPrewarm.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomPrewarm.dll')">$(RepoLibs)\CustomPrewarm.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomPrewarm.dll')">$(BattleTechGameDir)\Mods\Core\CustomPrewarm\CustomPrewarm.dll</HintPath>
     </Reference>
     <Reference Include="CustomSalvage">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomSalvage\CustomSalvage.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomSalvage.dll')">$(RepoLibs)\CustomSalvage.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomSalvage.dll')">$(BattleTechGameDir)\Mods\Core\CustomSalvage\CustomSalvage.dll</HintPath>
     </Reference>
-    <Reference Include="CustomUnitsHelper">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomUnits\CustomUnitsHelper.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\CustomUnitsHelper\CustomUnitsHelper.csproj">
+      <Name>CustomUnitsHelper</Name>
+    </ProjectReference>
     <Reference Include="CustomVoices">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomVoices\CustomVoices.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\CustomVoices.dll')">$(RepoLibs)\CustomVoices.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\CustomVoices.dll')">$(BattleTechGameDir)\Mods\Core\CustomVoices\CustomVoices.dll</HintPath>
     </Reference>
     <Reference Include="DOTween, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -85,14 +90,16 @@
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\InControl.dll</HintPath>
     </Reference>
     <Reference Include="IRBTModUtils">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\IRBTModUtils\IRBTModUtils.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\IRBTModUtils.dll')">$(RepoLibs)\IRBTModUtils.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\IRBTModUtils.dll')">$(BattleTechGameDir)\Mods\Core\IRBTModUtils\IRBTModUtils.dll</HintPath>
     </Reference>
     <Reference Include="MessagePack">
-      <HintPath>$(BattleTechGameDir)\Mods\Core\CustomPrewarm\MessagePack.dll</HintPath>
+      <HintPath Condition="Exists('$(RepoLibs)\\MessagePack.dll')">$(RepoLibs)\MessagePack.dll</HintPath>
+      <HintPath Condition="!Exists('$(RepoLibs)\\MessagePack.dll')">$(BattleTechGameDir)\Mods\Core\CustomPrewarm\MessagePack.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -266,19 +273,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist "$(BattleTechGameDir)\Mods_CBDE\Core\CustomUnits" (
-  copy /Y "$(TargetPath)" "$(BattleTechGameDir)\Mods_CBDE\Core\CustomUnits"
-  copy /Y "$(ProjectDir)..\AdditionalFiles\CU\Readme.txt" "$(BattleTechGameDir)\Mods_CBDE\Core\CustomUnits"
-)
-if exist "$(BattleTechGameDir)\Mods\Core\CustomUnits" (
-  echo %25BattleTechGameDir%25
-  copy /Y "$(TargetPath)" "$(BattleTechGameDir)\Mods\Core\CustomUnits"
-  copy /Y "$(ProjectDir)..\AdditionalFiles\CU\Readme.txt" "$(BattleTechGameDir)\Mods\Core\CustomUnits"
-)
-if exist "$(RogueTechRepo)\Core\CustomUnits" (
-  copy /Y "$(TargetPath)" "$(RogueTechRepo)\Core\CustomUnits"
-  copy /Y "$(ProjectDir)..\AdditionalFiles\CU\Readme.txt" "$(RogueTechRepo)\Core\CustomUnits"
-)
-		</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "$(BattleTechGameDir)\mods\CustomAmmoCategories"</PostBuildEvent>
   </PropertyGroup>
 </Project>

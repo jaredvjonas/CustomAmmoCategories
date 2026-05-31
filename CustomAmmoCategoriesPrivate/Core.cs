@@ -9,18 +9,14 @@
  *  If not, see <https://www.gnu.org/licenses/>. 
 */
 
-using BattleTech;
-using CustAmmoCategories;
-using CustomAmmoCategoriesLog;
-using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using HarmonyLib;
+using BattleTech;
 
 namespace CustomAmmoCategoriesPrivate{
   //[HarmonyPatch(typeof(AITeam))]
