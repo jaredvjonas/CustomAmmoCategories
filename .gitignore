@@ -340,3 +340,7 @@ Directory.Build.props
 # Local Claude Code config and build/release artifacts
 .claude/
 *.zip
+
+# Local deploy staging and vendored libs
+deploy/
+libs/
