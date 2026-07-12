@@ -770,7 +770,7 @@ namespace CustAmmoCategories {
             hit.isStray = true;
           }
         }
-        if (hit.target.isSpawnProtected() || sequence.attacker.isSpawnProtected()) {
+        if (CustomAmmoCategories.Settings.SpawnProtectionAffectsDamage && (hit.target.isSpawnProtected() || sequence.attacker.isSpawnProtected())) {
           hit.hitLocation = 0;
           hit.isStray = false;
         }
@@ -1392,7 +1392,7 @@ namespace CustAmmoCategories {
           hit.target = this.Sequence.chosenTarget;
           hit.hitLocation = hitInfo.hitLocations[hitIndex];
         }
-        if (hit.target.isSpawnProtected() || weapon.parent.isSpawnProtected()) {
+        if (CustomAmmoCategories.Settings.SpawnProtectionAffectsDamage && (hit.target.isSpawnProtected() || weapon.parent.isSpawnProtected())) {
           hit.hitLocation = 0;
         }
         Log.Combat?.WL(1, "h:"+hitIndex+" loc:("+hit.hitLocation+")"+hit.hitLocationStr+" trg:"+hit.target);

@@ -169,6 +169,7 @@ namespace CustAmmoCategories {
   [HarmonyPatch(new Type[] { typeof(AbstractActor), typeof(Weapon), typeof(ICombatant), typeof(Vector3), typeof(Vector3), typeof(int), typeof(MeleeAttackType), typeof(bool) })]
   public static class ToHit_GetToHitChance {
     public static void Postfix(ToHit __instance, AbstractActor attacker, Weapon weapon, ICombatant target, Vector3 attackPosition, Vector3 targetPosition, int numTargets, MeleeAttackType meleeAttackType, bool isMoraleAttack, ref float __result) {
+      if (CustomAmmoCategories.Settings.SpawnProtectionAffectsToHit == false) { return; }
       if (__result > CustomAmmoCategories.Epsilon) {
         if (attacker.isSpawnProtected() || target.isSpawnProtected()) {
           __result = 0f;

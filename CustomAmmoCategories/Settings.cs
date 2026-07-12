@@ -410,6 +410,8 @@ namespace CustAmmoCategories {
     public bool SpawnProtectionAffectsDesignMasks { get; set; } = true;
     public bool SpawnProtectionAffectsBurningTerrain { get; set; } = true;
     public bool SpawnProtectionAffectsCanFire { get; set; } = true;
+    public bool SpawnProtectionAffectsToHit { get; set; } = true;
+    public bool SpawnProtectionAffectsDamage { get; set; } = true;
     [SelfDocumentationDefaultValue("{\"regionDef_HostileDropZone\"}"), SelfDocumentationTypeName("list of strings")]
     public HashSet<string> hidableRegionsList { get; set; } = new HashSet<string>() { "regionDef_HostileDropZone" };
     public bool PlayerAlwaysCalledShot { get; set; } = false;
