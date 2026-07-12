@@ -337,3 +337,6 @@ ASALocalRun/
 
 # Ignore the VS Directory.build.props file
 Directory.Build.props 
+# Local Claude Code config and build/release artifacts
+.claude/
+*.zip
