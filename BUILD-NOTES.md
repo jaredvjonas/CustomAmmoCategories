@@ -90,3 +90,18 @@ added (it defaults to true and covers reinforcements). Backup: `C:\BattleTech\ba
 ## 2026-10-10: cFixes Javelin JVN-10A mechdef JSON fixed
 `Mods\cFixes-1.9.1.1\mech\mechdef_javelin_JVN-10A.json` (cFixes 1.9.1.1 ships it like this) is missing a comma after `"unit_armor_low"` in MechTags,
 so it failed to load ("After parsing a value an unexpected character ... MechTags.items[9]"). Comma added. Backup: `C:\BattleTech\backups\2026-10-10-cfixes-javelin\`.
+
+## 2026-10-11: CustomComponents manifest updated (mech lab showed no hardpoints)
+The deployed `Mods\CustomComponents\mod.json` was the old Denadan release manifest; our fork DLL needs `CCHardpoints` definitions, but the old
+manifest neither registered that resource type nor shipped `data/hardpoints`. Result: "Missing weapon category info" for every weapon
+(even Ballistic/Energy/Missile), ModTek "Type of entry unknown ... (CCHardpoints)" for IrianTech's omni file, and no hardpoints in the mech lab.
+Fix: copied the fork's `data\` (hardpoints + unittypes) into `Mods\CustomComponents\`, added `CustomSVGIcon, CCHardpoints, CCCEquipLocationTag,
+CCUnitTypes` to `CustomResourceTypes`, and added Manifest entries for `data/unittypes` (CCUnitTypes) and `data/hardpoints` (CCHardpoints).
+Other settings left as they were. Backup: `C:\BattleTech\backups\CustomComponents-2026-10-11\`.
+
+## 2026-10-12: CAC message text missing (showed CAC.MESSAGE_ID keys)
+In-game CAC messages showed raw `CAC.<id>` keys instead of text. CAC writes `__/<key>/__` placeholders and CustomLocalization
+fills them from any `Localization.json` it finds under `Mods\`, but the old deployed `Mods\CustomAmmoCategories` layout had no
+`Localization\` folder. Fix: copied `AdditionalFiles\CAC\Localization\` (AIM + CAC, with DE/RU subfolders) to
+`Mods\CustomAmmoCategories\Localization\`. Keep the DE subfolder: `CAC.Damaged` and `CAC.Destroyed` (jam results) are defined only there,
+with their English text. This is part of a CAC deploy, alongside the companion DLLs.
